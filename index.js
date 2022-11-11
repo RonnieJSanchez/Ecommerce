@@ -10,7 +10,9 @@ const app = express();
 //db
 mongoose
     .connect(process.env.MONGO_URI)
-
+    .then(() => console.log("DB Connected"))
+    .catch((err) => console.log("DB ERROR = ", err));
+    
 app.get('/users', (req, res) => {
     res.json({
         data: 'Ronnie Sanchez',
@@ -19,8 +21,8 @@ app.get('/users', (req, res) => {
 
 const port = process.env.PORT || 8000;
 
-app.listen(8000, () => {
-    console.log(`Node server is running on port 8000 ${port}`);
+app.listen(port, () => {
+    console.log(`Node server is running on port ${port}`);
 });
 
 
