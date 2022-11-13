@@ -22,8 +22,8 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
     try{
-        const {name} = req.body
-        const {categoryID} = req.params
+        const { name } = req.body
+        const { categoryId } = req.params
         const category = await Category.findByIdAndUpdate(
             categoryId, 
             {
@@ -42,7 +42,7 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
     try{
         const removed = await Category.findByIdAndDelete(req.params.categoryId)
-        read.json(removed);
+        res.json(removed);
     } catch (err) {
         console.log(err)
         return res.status(400).json(err.message);
