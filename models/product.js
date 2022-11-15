@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
-const {ObjectId} = mongoose.Schema;
+const { ObjectId } = mongoose.Schema;
 
-const productSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema(
+    {
     name: {
         type: String,
         trim: true,
@@ -39,7 +40,7 @@ const productSchema = new mongoose.Schema({
         contentType: String,
     },
     shipping: {
-        reuired: false,
+        required: false,
         type: Boolean,
     },
 },
