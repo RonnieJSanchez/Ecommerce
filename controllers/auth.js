@@ -44,7 +44,7 @@ export const register = async (req, res) => {
             role: user.role,
             address: user.address,
         },
-        token
+        token,
     });
     } catch(err) {
       console.log(err);
