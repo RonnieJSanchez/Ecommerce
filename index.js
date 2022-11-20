@@ -1,4 +1,3 @@
-
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -6,6 +5,7 @@ import morgan from "morgan";
 import authRoutes from "./routes/auth.js";
 import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/product.js";
+import cors from "cors";
 
 
 dotenv.config();
@@ -19,6 +19,7 @@ mongoose
   .catch((err) => console.log("DB ERROR => ", err));
 
 // middlewares
+app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
