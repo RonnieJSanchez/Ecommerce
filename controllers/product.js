@@ -4,8 +4,8 @@ import slugify from "slugify";
 
 export const create = async (req, res) => {
   try {
-    console.log(req.fields);
-    console.log(req.files);
+    //console.log(req.fields);
+    //console.log(req.files);
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files;
@@ -13,19 +13,19 @@ export const create = async (req, res) => {
     // VALIDATION
     switch(true) {
       case !name.trim():
-        res.json({ error: "Name is required" });
+        return res.json({ error: "Name is required" });
       case !description.trim():
-        res.json({ error: "Description is required" });
+        return res.json({ error: "Description is required" });
       case !price.trim():
-        res.json({ error: "Price is required" });
+        return res.json({ error: "Price is required" });
       case !category.trim():
-        res.json({ error: "Category is required" });
+        return res.json({ error: "Category is required" });
       case !quantity.trim():
-        res.json({ error: "Quantity is required" });
+        return res.json({ error: "Quantity is required" });
       case !shipping.trim():
-        res.json({ error: "Shipping is required" });
-      case photo && photo.size > 1000000:
-        res.json({ error: "Image should be less than 1mb in size" });
+        return res.json({ error: "Shipping is required" });
+      case photo && photo.size > 1300000:
+        return res.json({ error: "Image should be less than 1.3mb in size" });
     }
 
 
@@ -141,3 +141,20 @@ export const update = async (req, res) => {
         return res.status(400).json(err.message);
     }
 };
+
+export const filteredProducts = async (req, res) => {
+  try {
+    const { checked, radio } = req.body;
+
+    let args = {}; // [0, 10]
+    if(checked.length > 0) args.category = checked;
+    if(radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
+    console.log("args => ", args);
+
+    const products = await Product.find(args);
+    console.log("filtered products query => ", products.length);
+    res.json(products);
+  } catch (err) {
+    console.log(err)
+  }
+}
