@@ -158,3 +158,28 @@ export const filteredProducts = async (req, res) => {
     console.log(err)
   }
 }
+
+export const productsCount = async (req, res) => {
+  try {
+    const total = await Product.find({}).estimatedDocumentCount();
+    res.json(total);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const listProducts = async (req, res) => {
+  try {
+    const perPage = 6;
+    const page = req.params.page ? req.params.page : 1;
+
+    const products = await Product.find({})
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({createdAt: -1});
+
+      res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
+};
