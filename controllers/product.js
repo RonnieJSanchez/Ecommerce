@@ -184,3 +184,20 @@ export const listProducts = async (req, res) => {
     console.log(err);
   }
 };
+
+// product search based on name or description
+export const productsSearch = async (req, res) => {
+  try {
+    const { keyword } = req.params;
+    const results = await Product.find({
+      $or: [
+        { name: {$regex: keyword, $options: "i"}}, 
+        { description: {$regex: keyword, $options: "i"}},
+      ],
+    }).select("-photo");
+
+    res.json(results);
+  } catch (err) {
+    console.log(err);
+  }
+};
