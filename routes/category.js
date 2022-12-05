@@ -4,15 +4,15 @@ const router = express.Router();
 
 //middlewares
 import { requireSignin, isAdmin } from "../middlewares/auth.js";
-// controllers 
-import { 
-    create, 
-    update, 
-    remove, 
-    list, 
-    read, 
-    ProductsByCategory,
- } from "../controllers/category.js";
+// controllers
+import {
+  create,
+  update,
+  remove,
+  list,
+  read,
+  ProductsByCategory,
+} from "../controllers/category.js";
 
 router.post("/category", requireSignin, isAdmin, create);
 router.put("/category/:categoryId", requireSignin, isAdmin, update);

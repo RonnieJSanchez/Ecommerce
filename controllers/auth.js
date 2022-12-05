@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import { hashPassword, comparePassword } from "../helpers/auth.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { hash } from "bcrypt";
 
 dotenv.config();
 
@@ -33,22 +34,22 @@ export const register = async (req, res) => {
       password: hashedPassword,
     }).save();
     // 6. Create signed jwt
-    const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET, {
-        expiresIn: "7d",
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
     });
-    // 7. send response 
-      res.json({
-        user: {
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            address: user.address,
-        },
-        token,
+    // 7. send response
+    res.json({
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+      },
+      token,
     });
-    } catch(err) {
-      console.log(err);
-    }
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const login = async (req, res) => {
@@ -69,29 +70,58 @@ export const login = async (req, res) => {
     }
     // 4. compare password
     const match = await comparePassword(password, user.password);
-    if(!match) {
-        return res.json({erroe: "Wrong password" });
+    if (!match) {
+      return res.json({ erroe: "Wrong password" });
     }
     // 5. Create signed jwt
-    const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET, {
-        expiresIn: "7d",
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
     });
-    // 6. send response 
-      res.json({
-        user: {
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            address: user.address,
-        },
-        token
+    // 6. send response
+    res.json({
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+      },
+      token,
     });
-    } catch(err) {
-      console.log(err);
-    }
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const secret = async (req, res) => {
-    res.json({ currentUser: req.user });
+  res.json({ currentUser: req.user });
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, password, address } = req.body;
+    const user = await User.findById(req.user._id);
+    // check password length
+    if (password && password.length < 6) {
+      return res.json({
+        error: "Password required: Should be at least 6 charaters long",
+      });
+    }
+    // hash the password
+    const hashedPassword = password ? await hashPassword(password) : undefined;
+
+    const updated = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        name: name || user.name,
+        password: hashedPassword || user.password,
+        address: address || user.address,
+      },
+      { new: true }
+    );
+
+    updated.password = undefined;
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+  }
+};

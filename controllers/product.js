@@ -11,7 +11,7 @@ export const create = async (req, res) => {
     const { photo } = req.files;
 
     // VALIDATION
-    switch(true) {
+    switch (true) {
       case !name.trim():
         return res.json({ error: "Name is required" });
       case !description.trim():
@@ -28,21 +28,20 @@ export const create = async (req, res) => {
         return res.json({ error: "Image should be less than 1.3mb in size" });
     }
 
-
     // CREATE PRODUCT
     const product = new Product({ ...req.fields, slug: slugify(name) });
 
-    if(photo) {
-        product.photo.data = fs.readFileSync(photo.path);
-        product.photo.contentType = photo.type;
+    if (photo) {
+      product.photo.data = fs.readFileSync(photo.path);
+      product.photo.contentType = photo.type;
     }
 
-        await product.save();
-        res.json(product);
-    } catch (err) {
-        console.log(err);
-        return res.status(400).json(err.message);
-    }
+    await product.save();
+    res.json(product);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json(err.message);
+  }
 };
 
 export const list = async (req, res) => {
@@ -51,20 +50,20 @@ export const list = async (req, res) => {
       .populate("category")
       .select("-photo")
       .limit(12)
-      .sort({createdAt: -1});
+      .sort({ createdAt: -1 });
 
-      res.json(products);
+    res.json(products);
   } catch (err) {
     console.log(err);
   }
- };
+};
 
- export const read = async (req, res) => {
+export const read = async (req, res) => {
   try {
     const product = await Product.findOne({ slug: req.params.slug })
-    .select("-photo")
-    .populate("category");
-    
+      .select("-photo")
+      .populate("category");
+
     res.json(product);
   } catch (err) {
     console.log(err);
@@ -73,19 +72,21 @@ export const list = async (req, res) => {
 
 export const photo = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).select("photo");
-    if(product.photo.data) {
-      res.set('Content-Type', product.photo.contentType);
+    const product = await Product.findById(req.params.productId).select(
+      "photo"
+    );
+    if (product.photo.data) {
+      res.set("Content-Type", product.photo.contentType);
       return res.send(product.photo.data);
     }
   } catch (err) {
     console.log(err);
   }
-}; 
+};
 
-  //DELETE PRODUCT
+//DELETE PRODUCT
 export const remove = async (req, res) => {
-  try{
+  try {
     const product = await Product.findByIdAndDelete(
       req.params.productId
     ).select("-photo");
@@ -104,7 +105,7 @@ export const update = async (req, res) => {
     const { photo } = req.files;
 
     // VALIDATION
-    switch(true) {
+    switch (true) {
       case !name.trim():
         res.json({ error: "Name is required" });
       case !description.trim():
@@ -122,24 +123,26 @@ export const update = async (req, res) => {
     }
 
     // UPDATE PRODUCT
-    const product = new Product.findByIdAndUpdate(req.params.productId, {
-        ...req.fields, 
+    const product = new Product.findByIdAndUpdate(
+      req.params.productId,
+      {
+        ...req.fields,
         slug: slugify(name),
       },
-      { new: true } 
+      { new: true }
     );
 
     if (photo) {
-        product.photo.data = fs.readFileSync(photo.path);
-        product.photo.contentType = photo.type;
+      product.photo.data = fs.readFileSync(photo.path);
+      product.photo.contentType = photo.type;
     }
 
-        await product.save();
-        res.json(product);
-    } catch (err) {
-        console.log(err);
-        return res.status(400).json(err.message);
-    }
+    await product.save();
+    res.json(product);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json(err.message);
+  }
 };
 
 export const filteredProducts = async (req, res) => {
@@ -147,17 +150,17 @@ export const filteredProducts = async (req, res) => {
     const { checked, radio } = req.body;
 
     let args = {}; // [0, 10]
-    if(checked.length > 0) args.category = checked;
-    if(radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
+    if (checked.length > 0) args.category = checked;
+    if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
     console.log("args => ", args);
 
     const products = await Product.find(args);
     console.log("filtered products query => ", products.length);
     res.json(products);
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-}
+};
 
 export const productsCount = async (req, res) => {
   try {
@@ -177,9 +180,9 @@ export const listProducts = async (req, res) => {
       .select("-photo")
       .skip((page - 1) * perPage)
       .limit(perPage)
-      .sort({createdAt: -1});
+      .sort({ createdAt: -1 });
 
-      res.json(products);
+    res.json(products);
   } catch (err) {
     console.log(err);
   }
@@ -191,8 +194,8 @@ export const productsSearch = async (req, res) => {
     const { keyword } = req.params;
     const results = await Product.find({
       $or: [
-        { name: {$regex: keyword, $options: "i"}}, 
-        { description: {$regex: keyword, $options: "i"}},
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
       ],
     }).select("-photo");
 
@@ -213,8 +216,8 @@ export const relatedProducts = async (req, res) => {
       .populate("category")
       .limit(3);
 
-    res.json(related)
-  } catch (err){
+    res.json(related);
+  } catch (err) {
     console.log(err);
   }
 };
