@@ -3,6 +3,7 @@ import fs from "fs";
 import slugify from "slugify";
 import braintree from "braintree";
 import dotenv from "dotenv";
+import Order from "../models/order.js";
 
 dotenv.config();
 
@@ -256,7 +257,7 @@ export const processPayment = async (req, res) => {
     cart.map((i) => {
       total += i.price;
     });
-    console.log("total => ", total);
+    // console.log("total => ", total);
 
     let newTransaction = gateway.transaction.sale(
       {
@@ -268,7 +269,14 @@ export const processPayment = async (req, res) => {
       },
       function (error, result) {
         if (result) {
-          res.send(result);
+          // res.send(result);
+          // create order
+          const order = new Order({
+            products: cart,
+            payment: result,
+            buyer: req.user._id,
+          }).save();
+          res.json({ ok: true });
         } else {
           res.status(500).send(error);
         }

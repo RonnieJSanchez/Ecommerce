@@ -35,6 +35,6 @@ router.get("/products/search/:keyword", productsSearch);
 router.get("/related-products/:productId/:categoryId", relatedProducts);
 
 router.get("/braintree/token", getToken);
-router.post("/braintree/payment", processPayment);
+router.post("/braintree/payment", requireSignin, processPayment);
 
 export default router;
